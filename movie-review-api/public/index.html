@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Review App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    #movie-list {
+      margin-top: 20px;
+    }
+    .movie {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Movie Review App</h1>
+
+  <div id="movie-list"></div>
+
+  <h2>Add a New Movie</h2>
+  <form id="movie-form">
+    <label for="title">Movie Title:</label><br>
+    <input type="text" id="title" name="title" required><br>
+    <label for="director">Director:</label><br>
+    <input type="text" id="director" name="director" required><br><br>
+    <button type="submit">Add Movie</button>
+  </form>
+
+  <script>
+    // Base URL for the API
+    const apiUrl = 'http://localhost:3000/movies';
+
+    // Function to load movies from the API
+    async function loadMovies() {
+      const response = await fetch(apiUrl);
+      const movies = await response.json();
+      const movieList = document.getElementById('movie-list');
+      movieList.innerHTML = '';
+
+      movies.forEach(movie => {
+        const movieDiv = document.createElement('div');
+        movieDiv.classList.add('movie');
+        movieDiv.innerHTML = `<strong>${movie.title}</strong> (Director: ${movie.director})`;
+        movieList.appendChild(movieDiv);
+      });
+    }
+
+    // Function to add a new movie
+    document.getElementById('movie-form').addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const title = document.getElementById('title').value;
+      const director = document.getElementById('director').value;
+
+      const newMovie = {
+        title,
+        director
+      };
+
+      await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newMovie)
+      });
+
+      document.getElementById('movie-form').reset();
+      loadMovies(); // Reload the movie list after adding a new movie
+    });
+
+    // Load movies on page load
+    loadMovies();
+  </script>
+</body>
+</html>
